@@ -16,7 +16,7 @@ variable "password" {
 }
 
 variable "port" {
-  default = 55432
+  default = 5432
 }
 
 provider "postgresql" {
