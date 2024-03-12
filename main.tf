@@ -12,7 +12,7 @@ variable "host" {
 }
 
 variable "password" {
-  default = "adm"
+  default = "abc-123-hgd-@#$"
 }
 
 variable "port" {
