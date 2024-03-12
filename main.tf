@@ -8,7 +8,7 @@ terraform {
 }
 
 variable "host" {
-  default = "localhost"
+  default = "postgres.dkr-resources-docker-default-recipe-app.svc.cluster.local"
 }
 
 variable "password" {
