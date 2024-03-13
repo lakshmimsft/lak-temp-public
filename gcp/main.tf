@@ -8,9 +8,16 @@ terraform {
   }
 }
 
-provider "google" {
-  credentials = file("/Users/lakshmi/.config/gcloud/application_default_credentials.json")
+data "kubernetes_secret" "gcloud_creds" {
+  metadata {
+    name      = "gcloud-creds"
+    namespace = "default"
+  }
+}
 
+provider "google" {
+  credentials = data.kubernetes_secret.gcloud_creds.data["creds"]
+  
   project = "focal-woods-358701"
   region  = "us-central1"
   zone    = "us-central1-c"
