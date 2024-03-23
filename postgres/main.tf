@@ -14,6 +14,7 @@ terraform {
 variable "password" {
   description = "The password for the PostgreSQL database"
   type        = string
+  default     = "234#$%-test"
 }
 
 resource "kubernetes_deployment" "postgres" {
