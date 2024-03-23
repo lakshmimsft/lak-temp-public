@@ -90,13 +90,13 @@ provider "postgresql" {
   sslmode  = "disable"
 }
 
-resource "time_sleep" "wait_10_seconds" {
+resource "time_sleep" "wait_30_seconds" {
   depends_on = [kubernetes_service.postgres]
 
-  create_duration = "10s"
+  create_duration = "30s"
 }
 
 resource postgresql_database "pg_db_test" {
-  depends_on = [time_sleep.wait_10_seconds]
+  depends_on = [time_sleep.wait_30_seconds]
   name = "pg_db_test"
 }
