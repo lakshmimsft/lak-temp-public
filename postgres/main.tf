@@ -28,7 +28,7 @@ variable "port" {
 resource "kubernetes_deployment" "postgres" {
   metadata {
     name      = "postgres"
-    namespace = "postgresns"
+    namespace = var.context.runtime.kubernetes.namespace
   }
 
   spec {
@@ -67,7 +67,7 @@ resource "kubernetes_deployment" "postgres" {
 resource "kubernetes_service" "postgres" {
   metadata {
     name      = "postgres"
-    namespace = "postgresns"
+    namespace = var.context.runtime.kubernetes.namespace
   }
 
   spec {
