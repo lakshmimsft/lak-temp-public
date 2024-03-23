@@ -6,7 +6,7 @@ terraform {
     }
     postgresql = {
       source  = "cyrilgdn/postgresql"
-      version = ">= 1.16.0"
+      version = "1.16.0"
     }
   }
 }
@@ -26,7 +26,7 @@ variable "password" {
 resource "kubernetes_deployment" "postgres" {
   metadata {
     name      = "postgres"
-    namespace = "var.context.runtime.kubernetes.namespace"
+    namespace = var.context.runtime.kubernetes.namespace
   }
 
   spec {
@@ -65,7 +65,7 @@ resource "kubernetes_deployment" "postgres" {
 resource "kubernetes_service" "postgres" {
   metadata {
     name      = "postgres"
-    namespace = "var.context.runtime.kubernetes.namespace"
+    namespace = var.context.runtime.kubernetes.namespace
   }
 
   spec {
