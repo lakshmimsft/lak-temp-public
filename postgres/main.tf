@@ -87,25 +87,3 @@ resource "kubernetes_service" "postgres" {
     }
   }
 }
-
-variable "port" {
-  default = 5432
-}
-
-provider "postgresql" {
-  host     = "postgres.pgs-resources-pgsql-recipe-app.svc.cluster.local"
-  port     = var.port
-  password = var.password
-  sslmode  = "disable"
-}
-
-resource "time_sleep" "wait_60_seconds" {
-  depends_on = [kubernetes_service.postgres]
-
-  create_duration = "60s"
-}
-
-resource postgresql_database "pg_db_test" {
-  depends_on = [time_sleep.wait_60_seconds]
-  name = "pg_db_test"
-}
