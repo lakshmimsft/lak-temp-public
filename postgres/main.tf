@@ -90,7 +90,7 @@ resource "kubernetes_service" "postgres" {
 }
 
 provider "postgresql" {
-  host     = var.host
+  host     = "postgres.pgs-resources-pgsql-default-recipe-app.svc.cluster.local"
   port     = var.port
   password = var.password
   sslmode  = "disable"
