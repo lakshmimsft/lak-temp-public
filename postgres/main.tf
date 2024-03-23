@@ -63,6 +63,7 @@ resource "kubernetes_deployment" "postgres" {
 
             initial_delay_seconds = 5
             period_seconds        = 5
+          }
         }
       }
     }
