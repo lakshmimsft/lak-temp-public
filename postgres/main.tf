@@ -19,6 +19,7 @@ variable "password" {
 variable "host" {
   description = "The host for the PostgreSQL database"
   type        = string
+  default     = "postgres.pgs-resources-pgsql-default-recipe-app.svc.cluster.local"
 }
 
 variable "port" {
