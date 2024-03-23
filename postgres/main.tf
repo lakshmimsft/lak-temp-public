@@ -75,7 +75,7 @@ resource "kubernetes_service" "postgres" {
 }
 
 variable "host" {
-  default = "localhost"
+  default = "postgres.default.svc.cluster.local"
 }
 
 variable "port" {
