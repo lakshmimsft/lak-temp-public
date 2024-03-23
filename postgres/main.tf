@@ -20,7 +20,7 @@ variable "password" {
 resource "kubernetes_deployment" "postgres" {
   metadata {
     name      = "postgres"
-    namespace = "postgresns"
+    namespace = "default"
   }
 
   spec {
@@ -59,7 +59,7 @@ resource "kubernetes_deployment" "postgres" {
 resource "kubernetes_service" "postgres" {
   metadata {
     name      = "postgres"
-    namespace = "postgresns"
+    namespace = "default"
   }
 
   spec {
