@@ -20,7 +20,6 @@ variable "context" {
 variable "password" {
   description = "The password for the PostgreSQL database"
   type        = string
-  default     = "abc-123-hgd-@#$"
 }
 
 resource "kubernetes_deployment" "postgres" {
