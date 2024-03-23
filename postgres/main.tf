@@ -96,6 +96,16 @@ provider "postgresql" {
   sslmode  = "disable"
 }
 
-resource postgresql_database "pg_db_test" {
+resource "null_resource" "delay" {
+  provisioner "local-exec" {
+    command = "sleep 60"
+  }
+  triggers = {
+    service_name = kubernetes_service.postgres.metadata[0].name
+  }
+}
+
+resource "postgresql_database" "pg_db_test" {
+  depends_on = [null_resource.delay]
   name = "pg_db_test"
 }
