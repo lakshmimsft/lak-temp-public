@@ -20,7 +20,7 @@ variable "password" {
 resource "kubernetes_deployment" "postgres" {
   metadata {
     name      = "postgres"
-    namespace = "default"
+    namespace = "var.context.runtime.kubernetes.namespace"
   }
 
   spec {
@@ -59,7 +59,7 @@ resource "kubernetes_deployment" "postgres" {
 resource "kubernetes_service" "postgres" {
   metadata {
     name      = "postgres"
-    namespace = "default"
+    namespace = "var.context.runtime.kubernetes.namespace"
   }
 
   spec {
@@ -75,7 +75,7 @@ resource "kubernetes_service" "postgres" {
 }
 
 variable "host" {
-  default = "postgres.default.svc.cluster.local"
+  default = "postgres.pgs-resources-pgsql-default-recipe-app.svc.cluster.local"
 }
 
 variable "port" {
