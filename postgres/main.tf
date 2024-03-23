@@ -65,6 +65,14 @@ resource "kubernetes_deployment" "postgres" {
           port {
             container_port = 5432
           }
+
+          readinessProbe {
+            exec {
+              command = ["pg_isready", "-U", "postgres"]
+            }
+            initialDelaySeconds = 5
+            periodSeconds       = 5
+          }
         }
       }
     }
