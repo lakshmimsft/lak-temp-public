@@ -70,8 +70,8 @@ resource "kubernetes_deployment" "postgres" {
             exec {
               command = ["pg_isready", "-U", "postgres"]
             }
-            initialDelaySeconds = 5
-            periodSeconds       = 5
+            initial_delay_seconds = 5
+            period_seconds       = 5
           }
         }
       }
