@@ -16,16 +16,6 @@ variable "password" {
   type        = string
 }
 
-variable "host" {
-  description = "The host for the PostgreSQL database"
-  type        = string
-  default     = "postgres.pgs-resources-pgsql-default-recipe-app.svc.cluster.local"
-}
-
-variable "port" {
-  default = 5432
-}
-
 resource "kubernetes_deployment" "postgres" {
   metadata {
     name      = "postgres"
@@ -83,23 +73,21 @@ resource "kubernetes_service" "postgres" {
   }
 }
 
+variable "host" {
+  default = "postgres.pgs-resources-pgsql-default-recipe-app.svc.cluster.local"
+}
+
+variable "port" {
+  default = 5432
+}
+
 provider "postgresql" {
-  host     = "postgres.pgs-resources-pgsql-default-recipe-app.svc.cluster.local"
+  host     = var.host
   port     = var.port
   password = var.password
   sslmode  = "disable"
 }
 
-resource "null_resource" "delay" {
-  provisioner "local-exec" {
-    command = "sleep 60"
-  }
-  triggers = {
-    service_name = kubernetes_service.postgres.metadata[0].name
-  }
-}
-
-resource "postgresql_database" "pg_db_test" {
-  depends_on = [null_resource.delay]
+resource postgresql_database "pg_db_test" {
   name = "pg_db_test"
 }
