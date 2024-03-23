@@ -80,16 +80,12 @@ resource "kubernetes_service" "postgres" {
   }
 }
 
-variable "host" {
-  default = postgres.pgs-resources-pgsql-recipe-app.svc.cluster.local
-}
-
 variable "port" {
   default = 5432
 }
 
 provider "postgresql" {
-  host     = var.host
+  host     = postgres.pgs-resources-pgsql-recipe-app.svc.cluster.local
   port     = var.port
   password = var.password
   sslmode  = "disable"
