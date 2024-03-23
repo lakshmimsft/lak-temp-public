@@ -85,7 +85,7 @@ variable "port" {
 }
 
 provider "postgresql" {
-  host     = postgres.pgs-resources-pgsql-recipe-app.svc.cluster.local
+  host     = "postgres.pgs-resources-pgsql-recipe-app.svc.cluster.local"
   port     = var.port
   password = var.password
   sslmode  = "disable"
