@@ -16,6 +16,14 @@ variable "password" {
   type        = string
 }
 
+variable "host" {
+  default = "localhost"
+}
+
+variable "port" {
+  default = 5432
+}
+
 resource "kubernetes_deployment" "postgres" {
   metadata {
     name      = "postgres"
@@ -71,14 +79,6 @@ resource "kubernetes_service" "postgres" {
       target_port = 5432
     }
   }
-}
-
-variable "host" {
-  default = "localhost"
-}
-
-variable "port" {
-  default = 5432
 }
 
 provider "postgresql" {
