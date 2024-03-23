@@ -66,7 +66,7 @@ resource "kubernetes_deployment" "postgres" {
             container_port = 5432
           }
 
-          readinessProbe {
+          readiness_probe {
             exec {
               command = ["pg_isready", "-U", "postgres"]
             }
