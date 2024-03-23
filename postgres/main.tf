@@ -17,7 +17,8 @@ variable "password" {
 }
 
 variable "host" {
-  default = "localhost"
+  description = "The host for the PostgreSQL database"
+  type        = string
 }
 
 variable "port" {
