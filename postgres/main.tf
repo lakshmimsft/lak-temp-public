@@ -25,6 +25,12 @@ variable "port" {
   default = 5432
 }
 
+variable "context" {
+  description = "This variable contains Radius recipe context."
+
+  type = any
+}
+
 resource "kubernetes_deployment" "postgres" {
   metadata {
     name      = "postgres"
