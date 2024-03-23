@@ -81,7 +81,7 @@ resource "kubernetes_service" "postgres" {
 }
 
 variable "host" {
-  default = "postgres.pgs-resources-pgsql-default-recipe-app.svc.cluster.local"
+  default = "postgres.pgs-resources-pgsql-recipe-app.svc.cluster.local"
 }
 
 variable "port" {
