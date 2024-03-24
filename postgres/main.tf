@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = ">= 2.0"
     }
+    postgresql = {
+      source  = "cyrilgdn/postgresql"
+      version = "1.16.0"
+    }
   }
 }
 
@@ -51,15 +55,6 @@ resource "kubernetes_deployment" "postgres" {
           port {
             container_port = 5432
           }
-
-          readiness_probe {
-            exec {
-              command = ["pg_isready", "-U", "postgres"]
-            }
-
-            initial_delay_seconds = 5
-            period_seconds        = 5
-          }
         }
       }
     }
@@ -82,4 +77,26 @@ resource "kubernetes_service" "postgres" {
       target_port = 5432
     }
   }
+}
+
+variable "port" {
+  default = 5432
+}
+
+provider "postgresql" {
+  host     = "postgres.pgs-resources-pgsql-recipe-app.svc.cluster.local"
+  port     = var.port
+  password = var.password
+  sslmode  = "disable"
+}
+
+resource "time_sleep" "wait_10_seconds" {
+  depends_on = [kubernetes_service.postgres]
+
+  create_duration = "10s"
+}
+
+resource postgresql_database "pg_db_test" {
+  depends_on = [time_sleep.wait_60_seconds]
+  name = "pg_db_test"
 }
