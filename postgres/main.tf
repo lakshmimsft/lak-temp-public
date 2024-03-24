@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = ">= 2.0"
     }
+    postgresql = {
+      source  = "cyrilgdn/postgresql"
+      version = "1.16.0"
+    }
   }
 }
 
@@ -73,4 +77,14 @@ resource "kubernetes_service" "postgres" {
       target_port = 5432
     }
   }
+}
+
+resource "time_sleep" "wait_10_seconds" {
+  depends_on = [kubernetes_service.postgres]
+  create_duration = "10s"
+}
+
+resource postgresql_database "pg_db_test" {
+  depends_on = [time_sleep.wait_10_seconds]
+  name = "pg_db_test"
 }
