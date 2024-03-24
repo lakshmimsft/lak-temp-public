@@ -97,6 +97,6 @@ resource "time_sleep" "wait_10_seconds" {
 }
 
 resource postgresql_database "pg_db_test" {
-  depends_on = [time_sleep.wait_60_seconds]
+  depends_on = [time_sleep.wait_10_seconds]
   name = "pg_db_test"
 }
