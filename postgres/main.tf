@@ -79,16 +79,12 @@ resource "kubernetes_service" "postgres" {
   }
 }
 
-data "kubernetes_endpoints" "postgres" {
-  metadata {
-    name      = "postgres"
-    namespace = var.context.runtime.kubernetes.namespace
-  }
-
+resource "time_sleep" "wait_10_seconds" {
   depends_on = [kubernetes_service.postgres]
+  create_duration = "10s"
 }
 
-resource "postgresql_database" "pg_db_test" {
-  depends_on = [data.kubernetes_endpoints.postgres]
+resource postgresql_database "pg_db_test" {
+  depends_on = [time_sleep.wait_10_seconds]
   name = "pg_db_test"
 }
