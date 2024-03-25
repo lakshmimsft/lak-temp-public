@@ -79,12 +79,20 @@ resource "kubernetes_service" "postgres" {
   }
 }
 
-resource "time_sleep" "wait_10_seconds" {
+resource "null_resource" "db_service_ready_check" {
   depends_on = [kubernetes_service.postgres]
-  create_duration = "10s"
+
+  provisioner "local-exec" {
+    command = <<EOF
+    until echo > /dev/tcp/postgres.corerp-resources-terraform-pg-app.svc.cluster.local/5432; do 
+      echo "Waiting for PostgreSQL..."
+      sleep 1
+    done
+EOF
+  }
 }
 
-resource postgresql_database "pg_db_test" {
-  depends_on = [time_sleep.wait_10_seconds]
+resource "postgresql_database" "pg_db_test" {
+  depends_on = [null_resource.db_service_ready_check]
   name = "pg_db_test"
 }
