@@ -79,20 +79,16 @@ resource "kubernetes_service" "postgres" {
   }
 }
 
-resource "null_resource" "db_service_ready_check" {
-  depends_on = [kubernetes_service.postgres]
-
-  provisioner "local-exec" {
-    command = <<EOF
-    until echo > /dev/tcp/postgres.corerp-resources-terraform-pg-app.svc.cluster.local/5432; do 
-      echo "Waiting for PostgreSQL..."
-      sleep 1
-    done
-EOF
+data "kubernetes_endpoints" "postgres" {
+  metadata {
+    name      = "postgres"
+    namespace = var.context.runtime.kubernetes.namespace
   }
+
+  depends_on = [kubernetes_service.postgres]
 }
 
 resource "postgresql_database" "pg_db_test" {
-  depends_on = [null_resource.db_service_ready_check]
+  depends_on = [data.kubernetes_endpoints.postgres]
   name = "pg_db_test"
 }
