@@ -85,7 +85,7 @@ resource "time_sleep" "wait_10_seconds" {
 }
 
 resource postgresql_database "pg_db_test" {
-  provider = postgres.pgdb-test
+  provider = postgresql.pgdb-test
   depends_on = [time_sleep.wait_10_seconds]
   name = "pg_db_test"
 }
