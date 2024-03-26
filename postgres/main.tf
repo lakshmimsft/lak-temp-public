@@ -14,8 +14,13 @@ terraform {
 
 variable "context" {
   description = "This variable contains Radius recipe context."
-
-  type = any
+  type = object({
+    runtime = object({
+      kubernetes = object({
+        namespace = string
+      })
+    })
+  })
 }
 
 variable "password" {
