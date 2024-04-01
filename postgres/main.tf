@@ -89,8 +89,3 @@ resource postgresql_database "pg_db_test" {
   depends_on = [time_sleep.wait_10_seconds]
   name = "pg_db_test"
 }
-
-resource postgresql_database "pg_db_test2" {
-  depends_on = [time_sleep.wait_10_seconds]
-  name = "pg_db_test2"
-}
