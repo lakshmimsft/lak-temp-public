@@ -15,11 +15,11 @@ terraform {
 // temporary
 provider "postgresql" {
   alias    = "pgdb-test"
-  host     = "localhost"
+  host     = "postgres.corerp-resources-terraform-pg-app.svc.cluster.local"
   port     = 5432
   username = "postgres"
   password = var.password
-  sslmode  = "require"
+  sslmode  = "disable"
 }
 // end temporary
 
