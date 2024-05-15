@@ -12,6 +12,17 @@ terraform {
   }
 }
 
+// temporary
+provider "postgresql" {
+  alias    = "pgdb-test"
+  host     = "localhost"
+  port     = 5432
+  username = "postgres"
+  password = var.password
+  sslmode  = "require"
+}
+// end temporary
+
 variable "context" {
   description = "This variable contains Radius recipe context."
   type = any
