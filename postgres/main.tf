@@ -12,17 +12,6 @@ terraform {
   }
 }
 
-// temporary
-provider "postgresql" {
-  alias    = "pgdb-test"
-  host     = "postgres.corerp-resources-terraform-pg-app.svc.cluster.local"
-  port     = 5432
-  username = "postgres"
-  password = var.password
-  sslmode  = "disable"
-}
-// end temporary
-
 variable "context" {
   description = "This variable contains Radius recipe context."
   type = any
