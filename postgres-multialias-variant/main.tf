@@ -29,9 +29,10 @@ variable "password" {
 }
 
 provider "postgresql" {
-  username = 'postgres'
+  username = "postgres"
   password = var.password
   sslmode  = "disable"
+  host = "postgres.corerp-resources-terraform-pg-app.svc.cluster.local"
 }
 
 resource "kubernetes_deployment" "postgres1" {
