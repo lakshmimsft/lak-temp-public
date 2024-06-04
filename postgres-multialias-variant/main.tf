@@ -28,6 +28,12 @@ variable "password" {
   default     = "pg_default_pwd"
 }
 
+provider "postgresql" {
+  username = 'postgres'
+  password = var.password
+  sslmode  = "disable"
+}
+
 resource "kubernetes_deployment" "postgres1" {
   metadata {
     name      = "postgres1"
