@@ -25,7 +25,7 @@ variable "password1" {
 variable "password" {
   description = "The password for the PostgreSQL database"
   type        = string
-  default     = "default_password" // replace with your default password
+  default     = "pg_default_pwd"
 }
 
 resource "kubernetes_deployment" "postgres1" {
