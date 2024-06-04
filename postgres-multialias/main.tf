@@ -17,8 +17,13 @@ variable "context" {
   type = any
 }
 
-variable "password" {
-  description = "The password for the PostgreSQL database"
+variable "password1" {
+  description = "The password for the PostgreSQL1 database"
+  type        = string
+}
+
+variable "password2" {
+  description = "The password for the PostgreSQL2 database"
   type        = string
 }
 
@@ -49,7 +54,7 @@ resource "kubernetes_deployment" "postgres1" {
 
           env {
             name  = "POSTGRES_PASSWORD"
-            value = var.password
+            value = var.password1
           }
 
           port {
@@ -106,7 +111,7 @@ resource "kubernetes_deployment" "postgres2" {
 
           env {
             name  = "POSTGRES_PASSWORD"
-            value = var.password
+            value = var.password2
           }
 
           port {
