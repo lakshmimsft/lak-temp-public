@@ -21,12 +21,13 @@ variable "password1" {
   description = "The password for the PostgreSQL1 database"
   type        = string
 }
-/*
-variable "password2" {
-  description = "The password for the PostgreSQL2 database"
+
+variable "password" {
+  description = "The password for the PostgreSQL database"
   type        = string
+  default     = "default_password" // replace with your default password
 }
-*/
+
 resource "kubernetes_deployment" "postgres1" {
   metadata {
     name      = "postgres1"
