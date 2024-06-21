@@ -143,7 +143,7 @@ resource "kubernetes_service" "postgres2" {
 
 resource "time_sleep" "wait_20_seconds" {
   depends_on = [kubernetes_service.postgres1, kubernetes_service.postgres2]
-  create_duration = "2s"
+  create_duration = "20s"
 }
 
 resource "postgresql_database" "pg_db_test1" {
