@@ -106,7 +106,7 @@ resource "kubernetes_deployment" "postgres2" {
 
       spec {
         container {
-          image = "postgres:latest"
+          image = "ghcr.io/radius-project/mirror/postgres:latest"
           name  = "postgres2"
 
           env {
