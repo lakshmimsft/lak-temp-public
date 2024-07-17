@@ -78,12 +78,12 @@ resource "kubernetes_service" "postgres" {
   }
 }
 
-resource "time_sleep" "wait_20_seconds" {
+resource "time_sleep" "wait_60_seconds" {
   depends_on = [kubernetes_service.postgres]
-  create_duration = "20s"
+  create_duration = "60s"
 }
 
 resource postgresql_database "pg_db_test" {
-  depends_on = [time_sleep.wait_20_seconds]
+  depends_on = [time_sleep.wait_60_seconds]
   name = "pg_db_test"
 }
