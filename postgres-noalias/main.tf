@@ -11,10 +11,6 @@ terraform {
   }
 }
 
-provider "postgresql" {
-  depends_on = [null_resource.wait_for_postgres]
-}
-
 variable "context" {
   description = "This variable contains Radius recipe context."
   type        = any
