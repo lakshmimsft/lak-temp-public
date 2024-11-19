@@ -13,7 +13,7 @@ terraform {
 
 variable "context" {
   description = "This variable contains Radius recipe context."
-  type = any
+  type        = any
 }
 
 variable "password" {
@@ -78,12 +78,19 @@ resource "kubernetes_service" "postgres" {
   }
 }
 
-resource "time_sleep" "wait_60_seconds" {
-  depends_on = [kubernetes_service.postgres]
-  create_duration = "60s"
+resource "null_resource" "wait_for_postgres" {
+  depends_on = [
+    kubernetes_deployment.postgres,
+    kubernetes_service.postgres
+  ]
+
+  provisioner "local-exec" {
+    command = "kubectl wait --for=condition=ready pod -l app=postgres -n ${var.context.runtime.kubernetes.namespace} --timeout=300s"
+  }
 }
 
-resource postgresql_database "pg_db_test" {
-  depends_on = [time_sleep.wait_60_seconds]
+resource "postgresql_database" "pg_db_test" {
   name = "pg_db_test"
+
+  depends_on = [null_resource.wait_for_postgres]
 }
