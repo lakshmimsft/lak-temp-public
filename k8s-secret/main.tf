@@ -16,7 +16,7 @@ variable "context" {
 locals {
   secret_data = var.context.resource.properties.data
   secret_kind = coalesce(var.context.resource.properties.kind, "generic")
-  secret_name = context.resource.name
+  secret_name = var.context.resource.name
   
   # Separate base64 and string data
   base64_data = {
@@ -108,7 +108,8 @@ output "result" {
   description = "Result object matching Bicep recipe output format"
   value = {
     resources = [
-      "/planes/kubernetes/local/namespaces/${kubernetes_secret.secret.metadata[0].namespace}/providers/core/Secret/${kubernetes_secret.secret.metadata[0].name}"
+      "/planes/kubernetes/local/namespaces/${var.context.runtime.kubernetes.namespace}/providers/core/Secret/${local.secret_name}"
     ]
   }
 }
+
