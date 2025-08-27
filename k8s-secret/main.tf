@@ -103,3 +103,9 @@ resource "kubernetes_secret" "secret" {
   # Use binary_data for plain text values (Kubernetes will base64 encode them)
   binary_data = local.string_data
 }
+
+output result object = {
+  resources: [
+    '/planes/kubernetes/local/namespaces/${context.runtime.kubernetes.namespace}/providers/core/Secret/${secretName}'
+  ]
+}
