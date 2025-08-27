@@ -15,18 +15,18 @@ variable "context" {
 # Local values for processing secret data
 locals {
   secret_data = var.context.resource.properties.data
-  secret_kind = coalesce(var.context.resource.properties.kind, "generic")
+  secret_kind = try(var.context.resource.properties.kind, "generic")
   secret_name = var.context.resource.name
   
   # Separate base64 and string data
   base64_data = {
     for k, v in local.secret_data : k => v.value
-    if v.encoding == "base64"
+    if try(v.encoding, "") == "base64"
   }
   
   string_data = {
     for k, v in local.secret_data : k => v.value
-    if v.encoding != "base64"
+    if try(v.encoding, "") != "base64"
   }
   
   # Determine Kubernetes secret type
