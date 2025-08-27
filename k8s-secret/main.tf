@@ -98,8 +98,8 @@ resource "kubernetes_secret" "secret" {
   type = local.secret_type
   
   # Use data for base64-encoded values
-  data = local.base64_data
+  data = length(local.base64_data) > 0 ? local.base64_data : null
   
-  # Use binary_data for plain text values (Kubernetes will base64 encode them)
-  binary_data = local.string_data
+  # Use binary_data for plain text values (Terraform will base64 encode them)
+  binary_data = length(local.string_data) > 0 ? local.string_data : null
 }
