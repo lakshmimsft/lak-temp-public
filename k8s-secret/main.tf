@@ -104,8 +104,11 @@ resource "kubernetes_secret" "secret" {
   binary_data = local.string_data
 }
 
-output result object = {
-  resources: [
-    '/planes/kubernetes/local/namespaces/${context.runtime.kubernetes.namespace}/providers/core/Secret/${secretName}'
-  ]
-}
+output "result" {
+  description = "Result object matching Bicep recipe output format"
+  value = {
+    resources = [
+      "/planes/kubernetes/local/namespaces/${kubernetes_secret.secret.metadata[0].namespace}/providers/core/Secret/${kubernetes_secret.secret.metadata[0].name}"
+    ]
+  }
+}}
