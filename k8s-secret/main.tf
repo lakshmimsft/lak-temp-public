@@ -108,7 +108,7 @@ output "result" {
   description = "Result object matching Bicep recipe output format"
   value = {
     resources = [
-      "/planes/kubernetes/local/namespaces/${var.context.runtime.kubernetes.namespace}/providers/core/Secret/${local.secret_name}"
+      "/planes/kubernetes/local/providers/Test.Resources/secrets/${local.secret_name}"
     ]
   }
 }
