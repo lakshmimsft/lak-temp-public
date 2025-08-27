@@ -103,13 +103,3 @@ resource "kubernetes_secret" "secret" {
   # Use binary_data for plain text values (Kubernetes will base64 encode them)
   binary_data = local.string_data
 }
-
-output "result" {
-  description = "Result object matching Bicep recipe output format"
-  value = {
-    resources = [
-      "/planes/kubernetes/local/providers/Test.Resources/secrets/${local.secret_name}"
-    ]
-  }
-}
-
