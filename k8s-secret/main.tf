@@ -18,9 +18,9 @@ locals {
   secret_kind = try(var.context.resource.properties.kind, "generic")
   secret_name = var.context.resource.name
   
-  # Separate base64 and string data - decode base64 values first
+  # Separate base64 and string data
   base64_data = {
-    for k, v in local.secret_data : k => base64decode(v.value)
+    for k, v in local.secret_data : k => v.value
     if try(v.encoding, "") == "base64"
   }
   
@@ -97,6 +97,9 @@ resource "kubernetes_secret" "secret" {
   
   type = local.secret_type
   
-  # Use binary_data for all values (Terraform will base64 encode them)
-  binary_data = merge(local.base64_data, local.string_data)
+  # Use data for base64-encoded values (already encoded)
+  data = length(local.base64_data) > 0 ? local.base64_data : {}
+  
+  # Use binary_data for plain text values (will be base64 encoded)
+  binary_data = length(local.string_data) > 0 ? local.string_data : {}
 }
