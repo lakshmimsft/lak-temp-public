@@ -25,7 +25,7 @@ locals {
   }
   
   string_data = {
-    for k, v in local.secret_data : k => v.value
+    for k, v in local.secret_data : k => base64encode(v.value)
     if try(v.encoding, "") != "base64"
   }
   
@@ -97,9 +97,9 @@ resource "kubernetes_secret" "secret" {
   
   type = local.secret_type
   
-  # Use data for base64-encoded values (already encoded)
-  data = length(local.base64_data) > 0 ? local.base64_data : {}
+  # Use data for plain text values (base64 encoded by Terraform function)
+  data = length(local.string_data) > 0 ? local.string_data : {}
   
-  # Use binary_data for plain text values (will be base64 encoded)
-  binary_data = length(local.string_data) > 0 ? local.string_data : {}
+  # Use binary_data for already base64-encoded values
+  binary_data = length(local.base64_data) > 0 ? local.base64_data : {}
 }
