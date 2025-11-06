@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/vault"
       version = ">= 4.0.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.37.1"
+    }
   }
 }
 
@@ -93,10 +97,33 @@ resource "vault_kv_secret_v2" "secret" {
   ))
 }
 
+# Create a ConfigMap to track the Vault secret in Kubernetes
+resource "kubernetes_config_map" "vault_secret_metadata" {
+  metadata {
+    name      = local.secret_name
+    namespace = var.context.runtime.kubernetes.namespace
+
+    labels = {
+      resource      = var.context.resource.name
+      app           = var.context.application != null ? var.context.application.name : ""
+      "vault-secret" = "true"
+    }
+
+    annotations = {
+      "vault.hashicorp.com/path" = vault_kv_secret_v2.secret.path
+    }
+  }
+
+  data = {
+    vault_path = vault_kv_secret_v2.secret.path
+    vault_mount = vault_kv_secret_v2.secret.mount
+  }
+}
+
 output "result" {
   value = {
     resources = [
-      vault_kv_secret_v2.secret.id
+      "/planes/kubernetes/local/namespaces/${kubernetes_config_map.vault_secret_metadata.metadata[0].namespace}/providers/core/ConfigMap/${kubernetes_config_map.vault_secret_metadata.metadata[0].name}"
     ]
     values = {
       id   = vault_kv_secret_v2.secret.id
