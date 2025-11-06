@@ -7,7 +7,6 @@ terraform {
     postgresql = {
       source  = "cyrilgdn/postgresql"
       version = "1.22.0"
-      configuration_aliases = [postgresql.pgdb-test]
     }
     time = {
       source  = "hashicorp/time"
@@ -29,7 +28,6 @@ provider "vault" {
   # Skip TLS verification for local dev
   skip_tls_verify = true
 }
-
 
 variable "context" {
   description = "This variable contains Radius recipe context."
@@ -62,6 +60,13 @@ locals {
   postgres_password = local.vault_secret_name != "" ? jsondecode(data.vault_kv_secret_v2.postgres_secret[0].data_json)["password"] : var.password
 }
 
+provider "postgresql" {
+  host     = "postgres.${var.context.runtime.kubernetes.namespace}.svc.cluster.local"
+  port     = 5432
+  username = "postgres"
+  password = local.postgres_password
+  sslmode  = "disable"
+}
 
 resource "kubernetes_deployment" "postgres" {
   metadata {
@@ -125,8 +130,7 @@ resource "time_sleep" "wait_120_seconds" {
   create_duration = "120s"
 }
 
-resource postgresql_database "pg_db_test" {
-  provider = postgresql.pgdb-test
+resource "postgresql_database" "pg_db_test" {
   depends_on = [time_sleep.wait_120_seconds]
   name = "pg_db_test"
 }
