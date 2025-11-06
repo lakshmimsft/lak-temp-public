@@ -41,11 +41,15 @@ variable "password" {
 }
 
 locals {
-  # Get vault path from connection if it exists
-  vault_path = try(var.context.resource.connections.secretstore.path, "")
+  # Try multiple ways to get the vault secret name from the connection
+  # Option 1: Direct path from connection output values
+  vault_path_from_connection = try(var.context.resource.connections.secretstore.path, "")
 
-  # Extract secret name from path (format: secret/data/secret-name -> secret-name)
-  vault_secret_name = local.vault_path != "" ? replace(local.vault_path, "secret/data/", "") : ""
+  # Option 2: Get the secret resource name directly from the connection source
+   secret_resource_name = try(split("/", var.context.resource.connections.secretstore.source)[length(split("/", var.context.resource.connections.secretstore.source)) - 1], "")
+
+  # Use whichever is available, prefer the explicit path
+  vault_secret_name = local.vault_path_from_connection != "" ? replace(local.vault_path_from_connection, "secret/data/", "") : local.secret_resource_name
 }
 
 # Read password from Vault if connection exists
@@ -139,4 +143,21 @@ resource "time_sleep" "wait_120_seconds" {
 resource "postgresql_database" "pg_db_test" {
   depends_on = [time_sleep.wait_120_seconds]
   name = "pg_db_test"
+}
+
+output "debug_context" {
+  value = {
+    full_context = var.context
+    connections = try(var.context.resource.connections, {})
+    secretstore_connection = try(var.context.resource.connections.secretstore, {})
+  }
+}
+
+output "result" {
+  value = {
+    values = {
+      host = "postgres.${var.context.runtime.kubernetes.namespace}.svc.cluster.local"
+      port = 5432
+    }
+  }
 }
