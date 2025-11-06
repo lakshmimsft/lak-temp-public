@@ -101,7 +101,7 @@ resource "kubernetes_deployment" "postgres" {
 
           env {
             name  = "POSTGRES_PASSWORD"
-            value = local.postgres_password
+            value = local.vault_password_decoded
           }
 
           port {
