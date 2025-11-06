@@ -57,14 +57,20 @@ data "vault_kv_secret_v2" "postgres_secret" {
 
 locals {
   # Use password from Vault if available, otherwise use the password variable
-  postgres_password = local.vault_secret_name != "" ? jsondecode(data.vault_kv_secret_v2.postgres_secret[0].data_json)["password"] : var.password
+  vault_password_raw = local.vault_secret_name != "" ? jsondecode(data.vault_kv_secret_v2.postgres_secret[0].data_json)["password"] : ""
+
+  # Decode base64 password if it's from Vault (since secrets may be base64 encoded)
+  vault_password_decoded = local.vault_password_raw != "" ? base64decode(local.vault_password_raw) : ""
+
+  # Final password: use vault password if available, otherwise use password variable, otherwise use default
+  # postgres_password = local.vault_password_decoded != "" ? local.vault_password_decoded : (var.password != "" ? var.password : "defaultpassword")
 }
 
 provider "postgresql" {
   host     = "postgres.${var.context.runtime.kubernetes.namespace}.svc.cluster.local"
   port     = 5432
   username = "postgres"
-  password = local.postgres_password
+  password = local.vault_password_decoded
   sslmode  = "disable"
 }
 
