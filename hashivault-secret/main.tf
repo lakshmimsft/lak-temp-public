@@ -8,6 +8,16 @@ terraform {
   }
 }
 
+provider "vault" {
+  address = "http://vault.${var.context.runtime.kubernetes.namespace}.svc.cluster.local:8200"
+
+  # For dev mode, use root token
+  token = "root"
+
+  # Skip TLS verification for local dev
+  skip_tls_verify = true
+}
+
 variable "context" {
   description = "This variable contains Radius recipe context."
   type        = any
@@ -81,4 +91,13 @@ resource "vault_kv_secret_v2" "secret" {
       kind     = local.secret_kind
     }
   ))
+}
+
+output "result" {
+  value = {
+    values = {
+      id   = vault_kv_secret_v2.secret.id
+      path = vault_kv_secret_v2.secret.path
+    }
+  }
 }
