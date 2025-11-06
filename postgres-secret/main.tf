@@ -41,15 +41,15 @@ variable "password" {
 }
 
 locals {
-  # Try multiple ways to get the vault secret name from the connection
-  # Option 1: Direct path from connection output values
-  vault_path_from_connection = try(var.context.resource.connections.secretstore.path, "")
+  # Try to get the vault path from the connection (if readonly properties are populated)
+  vault_path = try(var.context.resource.connections.secretstore.path, "")
 
-  # Option 2: Get the secret resource name directly from the connection source
-   secret_resource_name = try(split("/", var.context.resource.connections.secretstore.source)[length(split("/", var.context.resource.connections.secretstore.source)) - 1], "")
+  # Fallback: Get the secret resource name from the connection source
+  secret_resource_name = try(split("/", var.context.resource.connections.secretstore.source)[length(split("/", var.context.resource.connections.secretstore.source)) - 1], "")
 
-  # Use whichever is available, prefer the explicit path
-  vault_secret_name = local.vault_path_from_connection != "" ? replace(local.vault_path_from_connection, "secret/data/", "") : local.secret_resource_name
+  # Extract the secret name from the vault path (format: secret/data/secret-name -> secret-name)
+  # Or use the resource name as fallback
+  vault_secret_name = local.vault_path != "" ? replace(local.vault_path, "secret/data/", "") : local.secret_resource_name
 }
 
 # Read password from Vault if connection exists
@@ -67,7 +67,7 @@ locals {
   vault_password_decoded = local.vault_password_raw != "" ? base64decode(local.vault_password_raw) : ""
 
   # Final password: use vault password if available, otherwise use password variable, otherwise use default
-  # postgres_password = local.vault_password_decoded != "" ? local.vault_password_decoded : (var.password != "" ? var.password : "defaultpassword")
+  postgres_password = local.vault_password_decoded != "" ? local.vault_password_decoded : (var.password != "" ? var.password : "defaultpassword")
 }
 
 provider "postgresql" {
