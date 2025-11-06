@@ -95,6 +95,9 @@ resource "vault_kv_secret_v2" "secret" {
 
 output "result" {
   value = {
+    resources = [
+      vault_kv_secret_v2.secret.id
+    ]
     values = {
       id   = vault_kv_secret_v2.secret.id
       path = vault_kv_secret_v2.secret.path
