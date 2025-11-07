@@ -52,15 +52,16 @@ locals {
 }
 
 # Read password from Vault using the connection's path
-# Using ephemeral to prevent password from being stored in Terraform state
-ephemeral "vault_kv_secret_v2" "postgres_secret" {
+# Note: Using data source (not ephemeral) because the password is used in deployment spec
+# which is stored in state. The password itself won't be in state, but referenced.
+data "vault_kv_secret_v2" "postgres_secret" {
   mount = "secret"
   name  = local.vault_secret_name
 }
 
 locals {
   # Get password from Vault and decode from base64
-  vault_password_raw = jsondecode(ephemeral.vault_kv_secret_v2.postgres_secret.data_json)["password"]
+  vault_password_raw = jsondecode(data.vault_kv_secret_v2.postgres_secret.data_json)["password"]
   postgres_password = base64decode(local.vault_password_raw)
 }
 
