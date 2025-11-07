@@ -4,17 +4,17 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = ">= 2.37.1"
     }
-    postgresql = {
-      source  = "cyrilgdn/postgresql"
-      version = "1.22.0"
+    vault = {
+      source  = "hashicorp/vault"
+      version = ">= 4.0.0"
     }
     time = {
       source  = "hashicorp/time"
       version = "0.12.1"
     }
-    vault = {
-      source  = "hashicorp/vault"
-      version = ">= 4.0.0"
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.0"
     }
   }
 }
@@ -58,14 +58,6 @@ locals {
   # Get password from Vault and decode from base64
   vault_password_raw = jsondecode(data.vault_kv_secret_v2.postgres_secret.data_json)["password"]
   postgres_password = base64decode(local.vault_password_raw)
-}
-
-provider "postgresql" {
-  host     = "postgres.${var.context.runtime.kubernetes.namespace}.svc.cluster.local"
-  port     = 5432
-  username = "postgres"
-  password = local.postgres_password
-  sslmode  = "disable"
 }
 
 resource "kubernetes_deployment" "postgres" {
@@ -130,9 +122,28 @@ resource "time_sleep" "wait_120_seconds" {
   create_duration = "120s"
 }
 
-resource "postgresql_database" "pg_db_test" {
+# Create database using kubectl exec instead of postgresql provider to avoid circular dependency
+resource "null_resource" "create_database" {
   depends_on = [time_sleep.wait_120_seconds]
-  name = "pg_db_test"
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      for i in {1..30}; do
+        kubectl exec -n ${var.context.runtime.kubernetes.namespace} deployment/postgres -- \
+          psql -U postgres -c "SELECT 1" > /dev/null 2>&1 && break
+        echo "Waiting for postgres to be ready... ($i/30)"
+        sleep 10
+      done
+
+      kubectl exec -n ${var.context.runtime.kubernetes.namespace} deployment/postgres -- \
+        psql -U postgres -c "CREATE DATABASE pg_db_test" || \
+        echo "Database may already exist"
+    EOT
+  }
+
+  triggers = {
+    deployment_id = kubernetes_deployment.postgres.id
+  }
 }
 
 output "debug_context" {
