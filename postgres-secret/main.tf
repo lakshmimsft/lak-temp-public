@@ -46,6 +46,9 @@ locals {
 
   # Extract the secret name from the vault path (format: secret/data/secret-name -> secret-name)
   vault_secret_name = replace(local.vault_path, "secret/data/", "")
+
+  # Use resource name for deployment/service to make them unique
+  postgres_name = var.context.resource.name
 }
 
 # Read password from Vault using the connection's path
@@ -62,21 +65,21 @@ locals {
 
 resource "kubernetes_deployment" "postgres" {
   metadata {
-    name      = "postgres"
+    name      = local.postgres_name
     namespace = var.context.runtime.kubernetes.namespace
   }
 
   spec {
     selector {
       match_labels = {
-        app = "postgres"
+        app = local.postgres_name
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "postgres"
+          app = local.postgres_name
         }
       }
 
@@ -101,13 +104,13 @@ resource "kubernetes_deployment" "postgres" {
 
 resource "kubernetes_service" "postgres" {
   metadata {
-    name      = "postgres"
+    name      = local.postgres_name
     namespace = var.context.runtime.kubernetes.namespace
   }
 
   spec {
     selector = {
-      app = "postgres"
+      app = local.postgres_name
     }
 
     port {
@@ -157,7 +160,7 @@ output "debug_context" {
 output "result" {
   value = {
     values = {
-      host = "postgres.${var.context.runtime.kubernetes.namespace}.svc.cluster.local"
+      host = "${local.postgres_name}.${var.context.runtime.kubernetes.namespace}.svc.cluster.local"
       port = 5432
     }
   }
