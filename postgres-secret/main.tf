@@ -41,33 +41,23 @@ variable "password" {
 }
 
 locals {
-  # Try to get the vault path from the connection (if readonly properties are populated)
-  vault_path = try(var.context.resource.connections.secretstore.path, "")
-
-  # Fallback: Get the secret resource name from the connection source
-  secret_resource_name = try(split("/", var.context.resource.connections.secretstore.source)[length(split("/", var.context.resource.connections.secretstore.source)) - 1], "")
+  # Get the vault path from the connection's readonly property
+  vault_path = var.context.resource.connections.secretstore.path
 
   # Extract the secret name from the vault path (format: secret/data/secret-name -> secret-name)
-  # Or use the resource name as fallback
-  vault_secret_name = local.vault_path != "" ? replace(local.vault_path, "secret/data/", "") : local.secret_resource_name
+  vault_secret_name = replace(local.vault_path, "secret/data/", "")
 }
 
-# Read password from Vault if connection exists
+# Read password from Vault using the connection's path
 data "vault_kv_secret_v2" "postgres_secret" {
-  count = local.vault_secret_name != "" ? 1 : 0
   mount = "secret"
   name  = local.vault_secret_name
 }
 
 locals {
-  # Use password from Vault if available, otherwise use the password variable
-  vault_password_raw = local.vault_secret_name != "" ? jsondecode(data.vault_kv_secret_v2.postgres_secret[0].data_json)["password"] : ""
-
-  # Decode base64 password if it's from Vault (since secrets may be base64 encoded)
-  vault_password_decoded = local.vault_password_raw != "" ? base64decode(local.vault_password_raw) : ""
-
-  # Final password: use vault password if available, otherwise use password variable, otherwise use default
-  postgres_password = local.vault_password_decoded != "" ? local.vault_password_decoded : (var.password != "" ? var.password : "defaultpassword")
+  # Get password from Vault and decode from base64
+  vault_password_raw = jsondecode(data.vault_kv_secret_v2.postgres_secret.data_json)["password"]
+  postgres_password = base64decode(local.vault_password_raw)
 }
 
 provider "postgresql" {
