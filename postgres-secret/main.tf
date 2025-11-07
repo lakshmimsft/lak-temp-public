@@ -52,14 +52,15 @@ locals {
 }
 
 # Read password from Vault using the connection's path
-data "vault_kv_secret_v2" "postgres_secret" {
+# Using ephemeral to prevent password from being stored in Terraform state
+ephemeral "vault_kv_secret_v2" "postgres_secret" {
   mount = "secret"
   name  = local.vault_secret_name
 }
 
 locals {
   # Get password from Vault and decode from base64
-  vault_password_raw = jsondecode(data.vault_kv_secret_v2.postgres_secret.data_json)["password"]
+  vault_password_raw = jsondecode(ephemeral.vault_kv_secret_v2.postgres_secret.data_json)["password"]
   postgres_password = base64decode(local.vault_password_raw)
 }
 
@@ -132,13 +133,13 @@ resource "null_resource" "create_database" {
   provisioner "local-exec" {
     command = <<-EOT
       for i in {1..30}; do
-        kubectl exec -n ${var.context.runtime.kubernetes.namespace} deployment/postgres -- \
+        kubectl exec -n ${var.context.runtime.kubernetes.namespace} deployment/${local.postgres_name} -- \
           psql -U postgres -c "SELECT 1" > /dev/null 2>&1 && break
         echo "Waiting for postgres to be ready... ($i/30)"
         sleep 10
       done
 
-      kubectl exec -n ${var.context.runtime.kubernetes.namespace} deployment/postgres -- \
+      kubectl exec -n ${var.context.runtime.kubernetes.namespace} deployment/${local.postgres_name} -- \
         psql -U postgres -c "CREATE DATABASE pg_db_test" || \
         echo "Database may already exist"
     EOT
