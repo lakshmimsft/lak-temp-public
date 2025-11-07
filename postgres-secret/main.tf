@@ -64,7 +64,7 @@ provider "postgresql" {
   host     = "postgres.${var.context.runtime.kubernetes.namespace}.svc.cluster.local"
   port     = 5432
   username = "postgres"
-  password = local.vault_password_decoded
+  password = local.postgres_password
   sslmode  = "disable"
 }
 
@@ -95,7 +95,7 @@ resource "kubernetes_deployment" "postgres" {
 
           env {
             name  = "POSTGRES_PASSWORD"
-            value = local.vault_password_decoded
+            value = local.postgres_password
           }
 
           port {
